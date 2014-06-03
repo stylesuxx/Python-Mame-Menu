@@ -35,7 +35,7 @@ class Games:
 		return self.items
 
 	def get_non_bad_items(self):
-		"Return all items that do not have the state 'bad'"
+		return [item for item in self.items if item.state != "bad"]
 
 	def get_bad_items(self):
 		"Only return the items with state bad"
@@ -61,6 +61,8 @@ class Games:
 				self.items.append(item)
 					
 			elem.clear()
+
+		sorted(self.items, key=lambda item: item.slug, reverse=False)
 
 	def generate_xml(self):
 		mame_xml_path = '/tmp/mame.xml'
