@@ -38,7 +38,7 @@ class Games:
 		return [item for item in self.items if item.state != "bad"]
 
 	def get_bad_items(self):
-		"Only return the items with state bad"
+		return [item for item in self.items if item.state == "bad"]
 
 	def load_xml(self):
 		context = etree.iterparse(self.game_xml_path, tag='game')
