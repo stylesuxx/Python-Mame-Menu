@@ -2,10 +2,12 @@
 Python based framebuffer mame menu for linux.
 
 #### Features
-* Shows only available games on your system
+* Shows only available(and playable) games on your system
 * Tracks played time per game
 * Shows games screenshot if available
 * Intuitive handling
+* Sorting by alphabet(ascending or descending) or by favorites
+* favorites calculated by play time
 
 #### Dependencies
 * python 2.7.x
