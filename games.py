@@ -40,6 +40,18 @@ class Games:
 	def get_bad_items(self):
 		return [item for item in self.items if item.state == "bad"]
 
+	def sort_ascending_by_alphabet(self):
+		self.items = sorted(self.items, key=lambda item: item.slug, reverse=False)
+
+	def sort_descending_by_alphabet(self):
+		self.items = sorted(self.items, key=lambda item: item.slug, reverse=True)
+
+	def sort_ascending_by_time(self):
+		self.items = sorted(self.items, key=lambda item: item.time, reverse=False)
+
+	def sort_descending_by_time(self):
+		self.items = sorted(self.items, key=lambda item: item.time, reverse=True)
+
 	def load_xml(self):
 		context = etree.iterparse(self.game_xml_path, tag='game')
 		for event, elem in context :

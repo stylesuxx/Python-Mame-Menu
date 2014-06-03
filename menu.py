@@ -14,6 +14,8 @@ class Menu:
 	alphabet = ['0', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 	screen = None
 	running = True
+	alphabet_sort = None
+	favorite_sort = None
 	items = []
 	active_item = 0
 	screen_size = None
@@ -64,7 +66,8 @@ class Menu:
 		pygame.display.update()
 		# Get all available games
 		self.games = games
-		self.items = self.games.get_all_items()
+		self.games.sort_ascending_by_alphabet()
+		self.items = self.games.get_non_bad_items()
 
 	def __del__(self):
 		"Destructor"
@@ -267,11 +270,25 @@ class Menu:
 
 			pygame.key.set_repeat(75, 150)
 
-		elif event.type == KEYDOWN and event.key == K_SPACE:
-			pass
-		elif event.type == KEYDOWN and event.key == K_LSHIFT:
-			pass
-		elif event.type == KEYDOWN and event.key == K_LALT:
-			pass
 		elif event.type == KEYDOWN and event.key == K_LCTRL:
+			"Toggle between ascending and descending alphabet sorting"
+			if self.alphabet_sort == "ascending":
+				self.games.sort_descending_by_alphabet()
+				self.alphabet_sort = "descending"
+			else:
+				self.games.sort_ascending_by_alphabet()
+				self.alphabet_sort = "ascending"
+
+			self.items = self.games.get_non_bad_items()
+			self.favorite_sort = None
+			self.active_item = 0
+
+		elif event.type == KEYDOWN and event.key == K_LALT:
+			"Sort by time played"
+			self.games.sort_descending_by_time()
+			self.items = self.games.get_non_bad_items()
+			
+			self.alphabet_sort = None
+			self.active_item = 0
+		elif event.type == KEYDOWN and event.key == K_SPACE:
 			pass
