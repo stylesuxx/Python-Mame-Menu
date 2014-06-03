@@ -22,12 +22,14 @@ class Games:
 
 		"Load game.xml or create one if it does not exist yet"
 		if os.path.isfile(game_xml_path):
-			self.load_game_xml()
+			self.load_xml()
 		else:
-			self.generate_game_xml()
+			print "Building mame xml and checking available games."
+			print "Lean back and relax, this may take some time..."
+			self.generate_xml()
 
 	def __del__(self):
-		"Cleanup"
+		"Destructor"
 
 	def get_all_items(self):
 		return self.items
@@ -38,7 +40,7 @@ class Games:
 	def get_bad_items(self):
 		"Only return the items with state bad"
 
-	def load_game_xml(self):
+	def load_xml(self):
 		context = etree.iterparse(self.game_xml_path, tag='game')
 		for event, elem in context :
 			keys = elem.keys()
@@ -60,7 +62,7 @@ class Games:
 					
 			elem.clear()
 
-	def generate_game_xml(self):
+	def generate_xml(self):
 		mame_xml_path = '/tmp/mame.xml'
 		os.system('mame -listxml > ' + mame_xml_path)
 
@@ -109,11 +111,10 @@ class Games:
 				tmp.append(item)
 
 		self.items = tmp
-		self.save_game_xml()
+		self.save_xml()
 
-	def save_game_xml(self):
+	def save_xml(self):
 		root = etree.Element("mame")
-		root.set('last_game', self.items[self.active_item].slug)
 		for item in self.items:
 			game = etree.SubElement(root, "game")
 			game.set('name', item.slug)

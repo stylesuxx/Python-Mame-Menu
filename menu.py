@@ -20,8 +20,8 @@ class Menu:
 	font_size = 20
 	max_image_width = 350
 	max_image_height = 768
-	game_xml_path = None
 	games = None
+	artwork_path = None
 	
 	def __init__(self, games):
 		"Ininitializes a new pygame screen using the framebuffer"
@@ -67,7 +67,10 @@ class Menu:
 		self.items = self.games.get_all_items()
 
 	def __del__(self):
-		"Destructor to make sure pygame shuts down, etc."
+		"Destructor"
+
+	def set_artwork_path(self, path):
+		self.artwork_path = path
 
 	def set_font_size(self, size):
 		self.font_size = size
@@ -109,7 +112,7 @@ class Menu:
 		# Clone of
 		if self.items[self.active_item].cloneof:
 			clone = 'Clone of ' + item.cloneof
-			self.draw_text(clone, (pos_x, (pos_y - self.font_size * 3)))
+			self.draw_text(clone, (pos_x, (pos_y - self.font_size * 3)), self.font_size)
 
 		# Times played
 		if item.played > 0:
@@ -118,48 +121,49 @@ class Menu:
 				played += 's'
 			if item.time > 0:
 				played += ' - ' + time.strftime('%H:%M:%S', time.gmtime(item.time))
-			self.draw_text(played, (pos_x, (pos_y - self.font_size * 4)))
+			self.draw_text(played, (pos_x, (pos_y - self.font_size * 4)), self.font_size)
 
 		# Release year
 		year = 'Year: ' + item.year + ' (' + item.state + ')'
-		self.draw_text(year, (pos_x, (pos_y - self.font_size * 2)))
+		self.draw_text(year, (pos_x, (pos_y - self.font_size * 2)), self.font_size)
 
 		# Manufacturer
 		manufacturer = self.items[self.active_item].manufacturer
-		self.draw_text(manufacturer, (pos_x, (pos_y - self.font_size)))
+		self.draw_text(manufacturer, (pos_x, (pos_y - self.font_size)), self.font_size)
 
 	def draw_image(self):
-		image_path = 'snap/' + self.items[self.active_item].slug + '.png'
-		if os.path.isfile(image_path):
-			image = pygame.image.load(image_path)
-			
-			image_width, image_height = image.get_size()
-			if image_width > image_height:
-				# fit to width
-				scale_factor = self.max_image_width/float(image_width)
-				new_height = scale_factor * image_height
-				if new_height > self.max_image_height:
-					scale_factor = by/float(image_height)
-					new_width = scale_factor * image_width
-					new_height = self.max_image_height
-				else:
-					new_width = self.max_image_width
-			else:
-				# fit to height
-				scale_factor = self.max_image_height/float(image_height)
-				new_width = scale_factor * image_width
-				if new_width > self.max_image_width:
+		if self.artwork_path:
+			image_path = self.artwork_path + '/' + self.items[self.active_item].slug + '.png'
+			if os.path.isfile(image_path):
+				image = pygame.image.load(image_path)
+				
+				image_width, image_height = image.get_size()
+				if image_width > image_height:
+					# fit to width
 					scale_factor = self.max_image_width/float(image_width)
-					new_width = self.max_image_width
 					new_height = scale_factor * image_height
+					if new_height > self.max_image_height:
+						scale_factor = self.max_image_height/float(image_height)
+						new_width = scale_factor * image_width
+						new_height = self.max_image_height
+					else:
+						new_width = self.max_image_width
 				else:
-					new_height = self.max_image_height
+					# fit to height
+					scale_factor = self.max_image_height/float(image_height)
+					new_width = scale_factor * image_width
+					if new_width > self.max_image_width:
+						scale_factor = self.max_image_width/float(image_width)
+						new_width = self.max_image_width
+						new_height = scale_factor * image_height
+					else:
+						new_height = self.max_image_height
 
-			new_width = int(math.ceil(new_width))
-			new_height = int(math.ceil(new_height))
+				new_width = int(math.ceil(new_width))
+				new_height = int(math.ceil(new_height))
 
-			image = pygame.transform.scale(image, (new_width, new_height))
-			self.screen.blit(image, (self.screen_size[0] - image.get_width() - 10, 10))
+				image = pygame.transform.scale(image, (new_width, new_height))
+				self.screen.blit(image, (self.screen_size[0] - image.get_width() - 10, 10))
 
 	def items_with_letter(self, letter):
 		for item in self.items:

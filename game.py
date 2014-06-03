@@ -1,6 +1,4 @@
-"""
-Hold information about a game.
-"""
+"Holds information about a game"
 class Game:
     slug = None
     name = None
