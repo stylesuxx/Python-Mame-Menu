@@ -5,22 +5,20 @@ import subprocess
 
 from game import *
 
-"""
-Load games from custom xml.
-
-If the file does not exist yet, generate it.
-First the mame.xml is generated, then mame checks for available games.
-Information about the currently available games is written to the custom xml.
-"""
 class Games:
-	items = None
+	items = []
 	game_xml_path = None
 
+	"""
+	Load games from custom xml.
+
+	If the file does not exist yet, generate it.
+	First the mame.xml is generated, then mame checks for available games.
+	Information about the currently available games is written to the custom xml.
+	"""
 	def __init__(self, game_xml_path):
 		self.game_xml_path = game_xml_path
-		self.items = []
-
-		"Load game.xml or create one if it does not exist yet"
+		
 		if os.path.isfile(game_xml_path):
 			self.load_xml()
 		else:
@@ -30,27 +28,6 @@ class Games:
 
 	def __del__(self):
 		"Destructor"
-
-	def get_all_items(self):
-		return self.items
-
-	def get_non_bad_items(self):
-		return [item for item in self.items if item.state != "bad"]
-
-	def get_bad_items(self):
-		return [item for item in self.items if item.state == "bad"]
-
-	def sort_ascending_by_alphabet(self):
-		self.items = sorted(self.items, key=lambda item: item.slug, reverse=False)
-
-	def sort_descending_by_alphabet(self):
-		self.items = sorted(self.items, key=lambda item: item.slug, reverse=True)
-
-	def sort_ascending_by_time(self):
-		self.items = sorted(self.items, key=lambda item: item.time, reverse=False)
-
-	def sort_descending_by_time(self):
-		self.items = sorted(self.items, key=lambda item: item.time, reverse=True)
 
 	def load_xml(self):
 		context = etree.iterparse(self.game_xml_path, tag='game')
@@ -106,6 +83,7 @@ class Games:
 		output = output.split('\n')
 		for line in output:
 			if line.startswith('romset'):
+				# Match a games state [good, bad, best available]
 				match = re.search('^romset ([a-zA-Z0-9]*) (\[[a-zA-Z0-9]*\] )?is (.*)$', line)
 				if match:
 					slug = match.group(1) 
@@ -115,16 +93,13 @@ class Games:
 					for item in self.items:
 						if item.slug == slug:
 							self.items[counter].state = state
+							break
 
 						counter += 1
 
 		# Remove all games with unknown state from the list
-		tmp = []
-		for item in self.items:
-			if item.state != 'unknown':
-				tmp.append(item)
-
-		self.items = tmp
+		self.items = [item for item in self.items if item.state != "unknown"]
+		
 		self.save_xml()
 
 	def save_xml(self):
@@ -150,3 +125,24 @@ class Games:
 
 		element_tree = etree.ElementTree(root)
 		element_tree.write(self.game_xml_path, pretty_print=True)
+
+	def get_all_items(self):
+		return self.items
+
+	def get_non_bad_items(self):
+		return [item for item in self.items if item.state != "bad"]
+
+	def get_bad_items(self):
+		return [item for item in self.items if item.state == "bad"]
+
+	def sort_ascending_by_alphabet(self):
+		self.items = sorted(self.items, key = lambda item: item.slug, reverse = False)
+
+	def sort_descending_by_alphabet(self):
+		self.items = sorted(self.items, key = lambda item: item.slug, reverse = True)
+
+	def sort_ascending_by_time(self):
+		self.items = sorted(self.items, key = lambda item: item.time, reverse = False)
+
+	def sort_descending_by_time(self):
+		self.items = sorted(self.items, key = lambda item: item.time, reverse = True)
