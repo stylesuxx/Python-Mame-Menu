@@ -6,7 +6,7 @@ class Game:
     manufacturer = None
     year = None
     cloneof = None
-    state = 'unknown'
+    state = None
     played = 0
     time = 0
 

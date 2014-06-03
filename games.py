@@ -35,7 +35,6 @@ class Games:
 			keys = elem.keys()
 			if not 'isdevice' in keys and not 'isbios' in keys:
 				item = Game()
-				item.cloneof = ''
 				if 'cloneof' in keys:
 					item.cloneof = elem.get('cloneof')
 
@@ -62,7 +61,6 @@ class Games:
 			keys = elem.keys()
 			if not 'isdevice' in keys and not 'isbios' in keys:
 				item = Game()
-				item.cloneof = ''
 				if 'cloneof' in keys:
 					item.cloneof = elem.get('cloneof')
 
@@ -98,7 +96,7 @@ class Games:
 						counter += 1
 
 		# Remove all games with unknown state from the list
-		self.items = [item for item in self.items if item.state != "unknown"]
+		self.items = [item for item in self.items if item.state]
 		
 		self.save_xml()
 
@@ -124,7 +122,7 @@ class Games:
 			time.text = str(item.time)
 
 		element_tree = etree.ElementTree(root)
-		element_tree.write(self.game_xml_path, pretty_print=True)
+		element_tree.write(self.game_xml_path, pretty_print = True)
 
 	def get_all_items(self):
 		return self.items
