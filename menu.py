@@ -5,6 +5,7 @@ import pygame
 from pygame.locals import *
 import re
 import subprocess
+import sys
 import time
 
 from game import *
@@ -262,7 +263,7 @@ class Menu:
 			possible all the time.
 			"""
 			pygame.key.set_repeat()
-			output = subprocess.check_output('mame -video soft ' + self.items[self.active_item].slug, shell = True)
+			output = subprocess.check_output('mame ' + self.items[self.active_item].slug, shell = True)
 			match = re.search('^.*\(([0-9]*) .*$', output)
 			if match:
 				time = int(match.group(1))
