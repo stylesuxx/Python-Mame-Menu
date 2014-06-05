@@ -2,6 +2,7 @@ from lxml import etree
 import os
 import re
 import subprocess
+import sys
 
 from game import *
 
@@ -31,24 +32,32 @@ class Games:
 
 	def load_xml(self):
 		context = etree.iterparse(self.game_xml_path, tag='game')
-		for event, elem in context :
-			keys = elem.keys()
-			if not 'isdevice' in keys and not 'isbios' in keys:
-				item = Game()
-				if 'cloneof' in keys:
-					item.cloneof = elem.get('cloneof')
+		try:
+			for event, elem in context :
+				keys = elem.keys()
+				if not 'isdevice' in keys and not 'isbios' in keys:
+					item = Game()
+					if 'cloneof' in keys:
+						item.cloneof = elem.get('cloneof')
 
-				item.slug = elem.get('name')
-				item.description = elem.xpath('description/text()')[0]
-				item.year = elem.xpath('year/text()')[0]
-				item.manufacturer = elem.xpath('manufacturer/text()')[0]
-				item.state = elem.xpath('state/text()')[0]
-				item.played = int(elem.xpath('played/text()')[0])
-				item.time = int(elem.xpath('time/text()')[0])
+					item.slug = elem.get('name')
+					item.description = elem.xpath('description/text()')[0]
+					item.year = elem.xpath('year/text()')[0]
+					item.manufacturer = elem.xpath('manufacturer/text()')[0]
+					item.state = elem.xpath('state/text()')[0]
+					item.played = int(elem.xpath('played/text()')[0])
+					item.time = int(elem.xpath('time/text()')[0])
 
-				self.items.append(item)
-					
-			elem.clear()
+					self.items.append(item)
+						
+				elem.clear()
+
+		except (etree.XMLSyntaxError, StopIteration):
+			print "XML Syntax error. Processing available nodes."
+
+		if len(self.items < 1):
+			print "There are no games in the xml file."
+			sys.exit(1)
 
 		sorted(self.items, key=lambda item: item.slug, reverse=False)
 
@@ -57,21 +66,25 @@ class Games:
 		os.system('mame -listxml > ' + mame_xml_path)
 
 		context = etree.iterparse(mame_xml_path, tag='game')
-		for event, elem in context :
-			keys = elem.keys()
-			if not 'isdevice' in keys and not 'isbios' in keys:
-				item = Game()
-				if 'cloneof' in keys:
-					item.cloneof = elem.get('cloneof')
+		try:
+			for event, elem in context:
+				keys = elem.keys()
+				if not 'isdevice' in keys and not 'isbios' in keys:
+					item = Game()
+					if 'cloneof' in keys:
+						item.cloneof = elem.get('cloneof')
 
-				item.slug = elem.get('name')
-				item.description = elem.xpath('description/text()')[0]
-				item.year = elem.xpath('year/text()')[0]
-				item.manufacturer = elem.xpath('manufacturer/text()')[0]
+					item.slug = elem.get('name')
+					item.description = elem.xpath('description/text()')[0]
+					item.year = elem.xpath('year/text()')[0]
+					item.manufacturer = elem.xpath('manufacturer/text()')[0]
 
-				self.items.append(item)
-					
-			elem.clear()
+					self.items.append(item)
+						
+				elem.clear()
+		
+		except (etree.XMLSyntaxError, StopIteration):
+			print "XML Syntax error. Processing available nodes."
 
 		try:
 			output = subprocess.check_output(['mame', '-verifyroms'])
